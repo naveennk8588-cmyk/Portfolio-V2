@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.core.mail import send_mail
+
+import resend
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -27,74 +28,57 @@ class ContactMessageView(APIView):
         contact_message = serializer.save()
 
         # --------------------------------------------------
-        # EMAIL 1: NOTIFICATION TO YOU
+        # EMAIL TO ADMIN
         # --------------------------------------------------
 
         admin_subject = (
             f"New Portfolio Contact: {contact_message.subject}"
         )
 
-        admin_message = f"""
-You received a new message from your portfolio website.
-
-Name: {contact_message.name}
-Email: {contact_message.email}
-Subject: {contact_message.subject}
-
-Message:
-{contact_message.message}
-
-Received at:
-{contact_message.created_at}
-"""
-
-        # --------------------------------------------------
-        # EMAIL 2: ACKNOWLEDGEMENT TO VISITOR
-        # --------------------------------------------------
-
-        visitor_subject = "Thank you for contacting Naveen Kumar"
-
-        visitor_message = f"""
-Hello {contact_message.name},
-
-Thank you for contacting me through my portfolio website.
-
-I have received your message regarding:
-
-Subject: {contact_message.subject}
-
-I will review your message and get back to you as soon as possible.
-
-Best regards,
-Naveen Kumar M
-Python Full Stack Developer
-"""
-
         try:
-            # Send notification to you
-            send_mail(
-                subject=admin_subject,
-                message=admin_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[
-                    settings.EMAIL_HOST_USER
-                ],
-                fail_silently=False,
-            )
+            resend.api_key = settings.RESEND_API_KEY
 
-            # Send acknowledgement to visitor
-            send_mail(
-                subject=visitor_subject,
-                message=visitor_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[
-                    contact_message.email
-                ],
-                fail_silently=False,
+            resend.Emails.send(
+                {
+                    "from": "Portfolio <onboarding@resend.dev>",
+                    "to": [settings.CONTACT_EMAIL],
+                    "subject": admin_subject,
+                    "html": f"""
+                        <h2>New Portfolio Contact Message</h2>
+
+                        <p>
+                            <strong>Name:</strong>
+                            {contact_message.name}
+                        </p>
+
+                        <p>
+                            <strong>Email:</strong>
+                            {contact_message.email}
+                        </p>
+
+                        <p>
+                            <strong>Subject:</strong>
+                            {contact_message.subject}
+                        </p>
+
+                        <p>
+                            <strong>Message:</strong>
+                        </p>
+
+                        <p>
+                            {contact_message.message}
+                        </p>
+
+                        <p>
+                            <strong>Received at:</strong>
+                            {contact_message.created_at}
+                        </p>
+                    """,
+                }
             )
 
         except Exception as email_error:
-            print("EMAIL ERROR:", email_error)
+            print("RESEND EMAIL ERROR:", email_error)
 
             return Response(
                 {
