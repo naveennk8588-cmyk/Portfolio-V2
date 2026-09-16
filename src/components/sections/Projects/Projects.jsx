@@ -98,7 +98,7 @@ const projects = [
     github: "naveennk8588-cmyk/Portfolio-V2",
 
     // CURRENT LOCAL PROJECT
-    demo: "#",
+    demo: "https://portfolio-v2-1-yzsa.onrender.com/#home",
   },
 ];
 
