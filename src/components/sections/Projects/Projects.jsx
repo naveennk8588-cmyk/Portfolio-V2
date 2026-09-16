@@ -95,7 +95,7 @@ const projects = [
     image: "/projects/portfolio-v2.png",
 
     // ADD YOUR GITHUB REPO AFTER PUSH
-    github: "#",
+    github: "naveennk8588-cmyk/Portfolio-V2",
 
     // CURRENT LOCAL PROJECT
     demo: "#",

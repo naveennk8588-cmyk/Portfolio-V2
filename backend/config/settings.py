@@ -170,6 +170,7 @@ MAILERS = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://portfolio-v2-1-yzsa.onrender.com",
 ]
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
